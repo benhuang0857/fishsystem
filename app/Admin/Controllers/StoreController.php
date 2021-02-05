@@ -65,7 +65,7 @@ class StoreController extends AdminController
     {
         $form = new Form(new Store());
 
-        $data = Machine::pluck('mac', 'mac');
+        $data = Machine::pluck('mac', 'id');
 
         $form->text('name', '店家名稱');
         $form->select('region', __('店家區域'))->options(['A' => 'A', 'B' => 'B', 'C' => 'C', 'D' => 'D', 'E' => 'E', 'F' => 'F']);

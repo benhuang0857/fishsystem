@@ -48,7 +48,6 @@ class MachineController extends AdminController
         $show = new Show(Machine::findOrFail($id));
 
         $show->field('id', __('Id'));
-        $show->field('sid', __('Sid'));
         $show->field('mac', __('Mac'));
         $show->field('category', __('Category'));
         $show->field('created_at', __('Created at'));
@@ -68,7 +67,6 @@ class MachineController extends AdminController
 
         $data = FishData::pluck('mac', 'mac');
 
-        $form->text('sid', __('Sid'));
         $form->select('category', __('機台Mac'))->options($data);
         $form->text('mac', __('機台種類'));
         
