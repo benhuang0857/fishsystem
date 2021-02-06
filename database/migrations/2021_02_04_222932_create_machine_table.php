@@ -15,7 +15,6 @@ class CreateMachineTable extends Migration
     {
         Schema::create('machine', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('sid')->nullable();
             $table->string('mac');
             $table->string('category');
             $table->timestamps();

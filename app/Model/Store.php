@@ -21,6 +21,6 @@ class Store extends Model
 
     public function Machine()
     {
-        return $this->hasMany(Machine::class, 'id', 'sid');
+        return $this->belongsToMany(Machine::class, 'store_machine', 'store_id', 'machine_id');
     }
 }

@@ -26,9 +26,10 @@ class MachineController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new Machine());
-
         $grid->column('mac', __('Mac'));
-        $grid->column('Store.name', __('店家名稱'));
+        $grid->column('store_name', __('店家名稱'))->display(function(){
+            return $this->store->isNotEmpty()?$this->store->first()->name:'';
+        });
         $grid->column('Store.region', __('機台區域'));
         $grid->column('category', __('機台種類'));
         $grid->column('created_at', __('建立時間'));
@@ -67,8 +68,8 @@ class MachineController extends AdminController
 
         $data = FishData::pluck('mac', 'mac');
 
-        $form->select('category', __('機台Mac'))->options($data);
-        $form->text('mac', __('機台種類'));
+        $form->select('mac', __('機台Mac'))->options($data);
+        $form->text('category', __('機台種類'));
         
 
         return $form;

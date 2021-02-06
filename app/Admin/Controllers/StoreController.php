@@ -69,7 +69,8 @@ class StoreController extends AdminController
 
         $form->text('name', '店家名稱');
         $form->select('region', __('店家區域'))->options(['A' => 'A', 'B' => 'B', 'C' => 'C', 'D' => 'D', 'E' => 'E', 'F' => 'F']);
-        $form->multipleSelect("machine_list", '店家機台Mac')->options($data);
+        //$form->multipleSelect("machine_list", '店家機台Mac')->options($data);
+        $form->multipleSelect("machine", '店家機台Mac')->options($data);
 
         return $form;
     }

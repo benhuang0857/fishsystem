@@ -10,6 +10,7 @@ class Machine extends Model
 
     public function Store()
     {
-        return $this->belongsTo(Store::class, 'sid', 'id');
+        return $this->belongsToMany(Store::class, 'store_machine', 'machine_id', 'store_id');
     }
+
 }
