@@ -1,0 +1,3 @@
+function getMessage(){
+    alert('OK');
+}

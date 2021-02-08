@@ -24,4 +24,9 @@ class FishData extends Model
     protected $fillable = [
         'mac', 'machine_id', 'coin_ratio', 'player_count', 'income', 'payout', 'update_time'
     ];
+
+    public function machine()
+    {
+        return $this->hasOne(Machine::class, 'mac', 'mac');
+    }
 }

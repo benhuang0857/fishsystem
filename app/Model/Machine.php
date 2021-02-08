@@ -13,4 +13,18 @@ class Machine extends Model
         return $this->belongsToMany(Store::class, 'store_machine', 'machine_id', 'store_id');
     }
 
+    public function fishData()
+    {
+        return $this->hasOne(FishData::class, 'mac', 'mac');
+    }
+
+    public function JackpotHistory()
+    {
+        return $this->hasMany(JackpotHistory::class, 'mac', 'mac');
+    }
+
+    public function PlayerData()
+    {
+        return $this->hasMany(PlayerData::class, 'mac', 'mac');
+    }
 }
