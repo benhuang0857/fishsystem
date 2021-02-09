@@ -35,7 +35,7 @@ class PlayerDataController extends AdminController
 
         $grid->filter(function($filter){
             $filter->disableIdFilter();
-            $filter->equal('Store.region', __('店家區域'))->select([
+            $filter->equal('Machine.Store.region', __('店家區域'))->select([
                 'A' => 'A',
                 'B' => 'B',
                 'C' => 'C',
@@ -43,8 +43,8 @@ class PlayerDataController extends AdminController
                 'E' => 'E',
                 'F' => 'F',
             ]);
-            $filter->equal('Store.name', __('店家名稱'));
-            $filter->like('category', __('機台種類'));
+            $filter->equal('Machine.Store.name', __('店家名稱'));
+            $filter->like('Machine.category', __('機台種類'));
             $filter->equal('mac', __('機台身分證'));
         });
 

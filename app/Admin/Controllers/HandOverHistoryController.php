@@ -25,8 +25,21 @@ class HandOverHistoryController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new HandOverHistory());
+
+        $grid->filter(function($filter){
+            $filter->disableIdFilter();
+            $filter->equal('Store.region', __('店家區域'))->select([
+                'A' => 'A',
+                'B' => 'B',
+                'C' => 'C',
+                'D' => 'D',
+                'E' => 'E',
+                'F' => 'F',
+            ]);
+            $filter->equal('Store.name', __('店家名稱'));
+        });
         
-        $grid->model()->orderBy('id', 'desc');
+        $grid->column('store.region', __('店家區域'));
         $grid->column('store.name', __('店家名稱'));
         $grid->column('income', __('收入'));
         $grid->column('payout', __('支出'));

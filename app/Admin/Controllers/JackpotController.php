@@ -3,6 +3,9 @@
 namespace App\Admin\Controllers;
 
 use App\Model\JackpotHistory;
+use App\Model\Store;
+use App\Model\Machine;
+use App\Model\StoreMachine;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -30,7 +33,7 @@ class JackpotController extends AdminController
 
         $grid->filter(function($filter){
             $filter->disableIdFilter();
-            $filter->equal('Store.region', __('店家區域'))->select([
+            $filter->equal('Machine.Store.region', __('店家區域'))->select([
                 'A' => 'A',
                 'B' => 'B',
                 'C' => 'C',
@@ -38,20 +41,36 @@ class JackpotController extends AdminController
                 'E' => 'E',
                 'F' => 'F',
             ]);
-            $filter->equal('Store.name', __('店家名稱'));
-            $filter->like('category', __('機台種類'));
+            $filter->equal('Machine.Store.name', __('店家名稱'));
+            $filter->like('Machine.category', __('機台種類'));
             $filter->equal('mac', __('機台身分證'));
         });
 
-        /*卡住
         $grid->column('store_name', __('店家名稱'))->display(function(){
-            return $this->Machine->store->first()->name;
+            if(Machine::where('mac', $this->mac)->first() != NULL)
+            {
+                $mid = Machine::where('mac', $this->mac)->first()->id;
+                $sid = StoreMachine::where('machine_id', $mid)->first()->store_id;
+                $store = Store::find($sid);
+    
+                return $store->first()->name;
+            }
+            return '';
         });
-        
-        $grid->column('store_region', __('機台區域'))->display(function(){
-            return $this->Machine->store->region;
+
+        $grid->column('store_region', __('店家區域'))->display(function(){
+            if(Machine::where('mac', $this->mac)->first() != NULL)
+            {
+                $mid = Machine::where('mac', $this->mac)->first()->id;
+                $sid = StoreMachine::where('machine_id', $mid)->first()->store_id;
+                $store = Store::find($sid);
+    
+                return $store->first()->region;
+            }
+            return '';
         });
-        */
+
+        $grid->column('Machine.category', __('機台種類'));
         $grid->column('player', __('拉彩位子'))->display(function ($player) {
             $result = (int)$player;
             $result += 1;
