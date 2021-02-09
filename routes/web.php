@@ -14,3 +14,5 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::post('/devname.php', 'MachineController@getMachine')->middleware('api');
