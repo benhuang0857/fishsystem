@@ -8,6 +8,10 @@ class PlayerData extends Model
 {
     protected $table = 'player_data';
 
+    protected $fillable = [
+        'mac', 'num', 'bet', 'credits'
+    ];
+
     public function JackpotHistory()
     {
         return $this->belongsTo(JackpotHistory::class, 'mac', 'mac');

@@ -17,4 +17,5 @@ Route::group([
     $router->resource('machine', MachineController::class);
     $router->resource('handover', HandOverHistoryController::class);
     $router->resource('jackpot', JackpotController::class);
+    $router->resource('playerdata', PlayerDataController::class);
 });

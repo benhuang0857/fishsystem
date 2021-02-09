@@ -3,6 +3,9 @@
 namespace App\Admin\Controllers;
 
 use App\Model\PlayerData;
+use App\Model\Store;
+use App\Model\Machine;
+use App\Model\StoreMachine;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -15,7 +18,7 @@ class PlayerDataController extends AdminController
      *
      * @var string
      */
-    protected $title = 'PlayerData';
+    protected $title = '玩家即時資訊';
 
     /**
      * Make a grid builder.
@@ -25,14 +28,57 @@ class PlayerDataController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new PlayerData());
+        $grid->model()->orderBy('update_time', 'DESC');
+        $grid->disableCreateButton();
 
-        $grid->column('id', __('Id'));
-        $grid->column('mac', __('Mac'));
-        $grid->column('num', __('Num'));
-        $grid->column('bet', __('Bet'));
-        $grid->column('credits', __('Credits'));
-        $grid->column('created_time', __('Created time'));
-        $grid->column('update_time', __('Update time'));
+        $grid->disableActions();
+
+        $grid->filter(function($filter){
+            $filter->disableIdFilter();
+            $filter->equal('Store.region', __('店家區域'))->select([
+                'A' => 'A',
+                'B' => 'B',
+                'C' => 'C',
+                'D' => 'D',
+                'E' => 'E',
+                'F' => 'F',
+            ]);
+            $filter->equal('Store.name', __('店家名稱'));
+            $filter->like('category', __('機台種類'));
+            $filter->equal('mac', __('機台身分證'));
+        });
+
+        $grid->column('store_name', __('店家名稱'))->display(function(){
+            if(Machine::where('mac', $this->mac)->first() != NULL)
+            {
+                $mid = Machine::where('mac', $this->mac)->first()->id;
+                $sid = StoreMachine::where('machine_id', $mid)->first()->store_id;
+                $store = Store::find($sid);
+    
+                return $store->first()->name;
+            }
+            return '';
+        });
+
+        $grid->column('store_region', __('店家區域'))->display(function(){
+            if(Machine::where('mac', $this->mac)->first() != NULL)
+            {
+                $mid = Machine::where('mac', $this->mac)->first()->id;
+                $sid = StoreMachine::where('machine_id', $mid)->first()->store_id;
+                $store = Store::find($sid);
+    
+                return $store->first()->region;
+            }
+            return '';
+        });
+        $grid->column('Machine.category', __('機台種類'));
+        $grid->column('num', __('座位號碼'))->display(function ($num) {
+            $result = (int)$num;
+            $result += 1;
+            return $result.'號';
+        });;
+        $grid->column('bet', __('開分(押分)'));
+        $grid->column('credits', __('洗分(餘分)'));
 
         return $grid;
     }
