@@ -29,6 +29,7 @@ class PlayerDataController extends AdminController
     {
         $grid = new Grid(new PlayerData());
         $grid->model()->orderBy('update_time', 'DESC');
+        $grid->model()->where('num', '<=', 5);
         $grid->disableCreateButton();
 
         $grid->disableActions();
