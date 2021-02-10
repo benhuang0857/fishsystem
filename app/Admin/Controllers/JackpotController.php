@@ -46,28 +46,12 @@ class JackpotController extends AdminController
             $filter->equal('mac', __('機台身分證'));
         });
 
-        $grid->column('store_name', __('店家名稱'))->display(function(){
-            if(Machine::where('mac', $this->mac)->first() != NULL)
-            {
-                $mid = Machine::where('mac', $this->mac)->first()->id;
-                $sid = StoreMachine::where('machine_id', $mid)->first()->store_id;
-                $store = Store::find($sid);
-    
-                return $store->first()->name;
-            }
-            return '';
+        $grid->column('store_name', __('店家名稱'))->display(function(){          
+            return isset($this->Machine->store) ? $this->Machine->store->first()->name : '';
         });
 
         $grid->column('store_region', __('店家區域'))->display(function(){
-            if(Machine::where('mac', $this->mac)->first() != NULL)
-            {
-                $mid = Machine::where('mac', $this->mac)->first()->id;
-                $sid = StoreMachine::where('machine_id', $mid)->first()->store_id;
-                $store = Store::find($sid);
-    
-                return $store->first()->region;
-            }
-            return '';
+            return isset($this->Machine->store) ? $this->Machine->store->first()->region : '';
         });
 
         $grid->column('Machine.category', __('機台種類'));
