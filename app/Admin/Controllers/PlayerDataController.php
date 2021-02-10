@@ -55,7 +55,7 @@ class PlayerDataController extends AdminController
         $grid->column('store_region', __('店家區域'))->display(function(){
             return isset($this->Machine->store) ? $this->Machine->store->first()->region : '';
         });
-        
+
         $grid->column('Machine.category', __('機台種類'));
         $grid->column('num', __('座位號碼'))->display(function ($num) {
             $result = (int)$num;
@@ -64,6 +64,7 @@ class PlayerDataController extends AdminController
         });;
         $grid->column('bet', __('開分(押分)'));
         $grid->column('credits', __('洗分(餘分)'));
+        $grid->column('update_time', __('更新時間'));
 
         return $grid;
     }
