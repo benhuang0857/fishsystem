@@ -33,17 +33,8 @@ class JackpotController extends AdminController
 
         $grid->filter(function($filter){
             $filter->disableIdFilter();
-            $filter->equal('Machine.Store.region', __('店家區域'))->select([
-                'A' => 'A',
-                'B' => 'B',
-                'C' => 'C',
-                'D' => 'D',
-                'E' => 'E',
-                'F' => 'F',
-            ]);
             $filter->equal('Machine.Store.name', __('店家名稱'));
             $filter->like('Machine.category', __('機台種類'));
-            $filter->equal('mac', __('機台身分證'));
         });
 
         $grid->column('store_name', __('店家名稱'))->display(function(){          
@@ -55,21 +46,21 @@ class JackpotController extends AdminController
         });
 
         $grid->column('Machine.category', __('機台種類'));
-        $grid->column('player', __('拉彩位子'))->display(function ($player) {
+        $grid->column('player', __('座位'))->display(function ($player) {
             $result = (int)$player;
             $result += 1;
             return $result.'號';
         });
-        $grid->column('jackpot', __('JP'))->display(function ($jackpot) {
-            $result = (int)$jackpot;
-            $result += 1;
-            return 'JP'.$result;
+        $grid->column('jackpot', __('JP名稱'))->display(function ($jackpot) {
+            $result1 = (int)$jackpot;
+            $result1 += 1;
+            return 'JP'.$result1;
         });
-        $grid->column('coins', __('硬幣'));
-        $grid->column('jackpot', __('彩金'))->display(function(){
+        //$grid->column('coins', __('硬幣'));
+        $grid->column('jackpotnum', __('彩金分數'))->display(function(){
             return $this->coins * 2000;
         });
-        $grid->column('jackpot_convert', __('彩金金額換算'))->display(function(){
+        $grid->column('jackpot_convert', __('彩金金額'))->display(function(){
             return $this->coins * 2000 / 500;
         });
         $grid->column('datetime', __('時間'))->sortable();

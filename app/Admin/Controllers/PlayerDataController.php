@@ -63,8 +63,8 @@ class PlayerDataController extends AdminController
             $result += 1;
             return $result.'號';
         });;
-        $grid->column('bet', __('開分(押分)'));
-        $grid->column('credits', __('洗分(餘分)'));
+        $grid->column('bet', __('押分'));
+        $grid->column('credits', __('餘分'));
         $grid->column('update_time', __('更新時間'));
 
         return $grid;

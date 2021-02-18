@@ -34,6 +34,21 @@ class MachineController extends Controller
         $region = $Store->find($sid)->region;
 
         echo header("Content-type:text/html;charset=utf-8");
-        echo $region.'區'.$name.$Machine->category.'-'.$player.'號玩家';
+
+        $part1 = $region.'區　'.$name.'　　　　　　';
+        $part2 = $Machine->category.'-'.$player.'號玩家';
+        $k = 31 - strlen($part1);
+        $j = 31 - strlen($part2);
+        echo $part1;
+        for($i=0; $i<$k; $i++)
+        {
+            echo "　";
+        }
+        echo $part2;
+        for($i=0; $i<$j; $i++)
+        {
+            echo "　";
+        }
+        //echo $region.'區'.$name.$Machine->category.'-'.$player.'號玩家';
     }
 }
