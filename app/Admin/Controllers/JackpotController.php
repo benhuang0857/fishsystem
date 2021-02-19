@@ -32,9 +32,13 @@ class JackpotController extends AdminController
         $grid->model()->orderBy('datetime', 'DESC');
 
         $grid->filter(function($filter){
+            $stores = Store::pluck('name', 'name');
+            $categories = Machine::pluck('category', 'category');
+
             $filter->disableIdFilter();
-            $filter->equal('Machine.Store.name', __('店家名稱'));
-            $filter->like('Machine.category', __('機台種類'));
+            $filter->equal('Machine.Store.name', __('店家名稱'))->select($stores);
+            $filter->like('Machine.category', __('機台種類'))->select($categories);
+            $filter->between('datetime', __('時間'))->datetime();
         });
 
         $grid->column('store_name', __('店家名稱'))->display(function(){          
@@ -45,7 +49,9 @@ class JackpotController extends AdminController
             return isset($this->Machine->store) ? $this->Machine->store->first()->region : '';
         });
 
-        $grid->column('Machine.category', __('機台種類'));
+        //$grid->column('Machine.category', __('機台種類'))->sortable();
+        $grid->column('category', __('機台種類'))->display(function(){return isset($this->Machine->category) ? $this->machine->category:'';})->sortable();
+
         $grid->column('player', __('座位'))->display(function ($player) {
             $result = (int)$player;
             $result += 1;
@@ -55,14 +61,14 @@ class JackpotController extends AdminController
             $result1 = (int)$jackpot;
             $result1 += 1;
             return 'JP'.$result1;
-        });
+        })->sortable();
         //$grid->column('coins', __('硬幣'));
         $grid->column('jackpotnum', __('彩金分數'))->display(function(){
             return $this->coins * 2000;
-        });
+        })->sortable();
         $grid->column('jackpot_convert', __('彩金金額'))->display(function(){
             return $this->coins * 2000 / 500;
-        });
+        })->sortable();
         $grid->column('datetime', __('時間'))->sortable();
 
         return $grid;
