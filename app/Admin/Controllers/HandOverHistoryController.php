@@ -39,6 +39,16 @@ class HandOverHistoryController extends AdminController
             $filter->equal('Store.name', __('店家名稱'));
         });
 
+        $grid->batchActions(function ($batch) {
+            $batch->disableDelete();
+        });
+        
+        // 去掉批量操作
+        $grid->disableBatchActions();
+
+        $grid->disableActions();
+
+        /*
         $grid->actions(function ($actions) {
 
             // 去掉删除
@@ -47,6 +57,7 @@ class HandOverHistoryController extends AdminController
             // 去掉编辑
             $actions->disableEdit();
         });
+        */
         
         $grid->column('store.region', __('店家區域'));
         $grid->column('store.name', __('店家名稱'));
