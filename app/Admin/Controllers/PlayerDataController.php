@@ -27,11 +27,11 @@ class PlayerDataController extends AdminController
      * @return Grid
      */
 
+     /*
     protected function grid()
     {
         $grid = new Grid(new PlayerData());
 
-        $grid->model()->orderBy('update_time', 'DESC');
         $grid->model()->where('num', '<=', 5);
         $grid->disableCreateButton();
 
@@ -69,6 +69,53 @@ class PlayerDataController extends AdminController
         $grid->column('bet', __('押分'));
         $grid->column('credits', __('餘分'));
         $grid->column('update_time', __('更新時間'));
+
+        return $grid;
+    }
+    */
+
+    protected function grid()
+    {
+        $grid = new Grid(new Machine());
+
+        $grid->model()->orderBy('updated_at', 'DESC');
+
+        $grid->filter(function($filter){
+            $filter->disableIdFilter();
+            $filter->equal('Store.region', __('店家區域'))->select([
+                'A' => 'A',
+                'B' => 'B',
+                'C' => 'C',
+                'D' => 'D',
+                'E' => 'E',
+                'F' => 'F',
+            ]);
+            $filter->equal('Store.name', __('店家名稱'));
+            $filter->like('category', __('機台種類'));
+            $filter->equal('mac', __('機台身分證'));
+        });
+
+        $grid->column('mac', __('Mac'))->expand(function () {
+
+            $PlayerData = $this->PlayerData()->where('num', '<=', 5)->get();
+            $PlayerDatas = $PlayerData->map(function ($PlayerData) {
+                $num = $PlayerData['num'] + 1;
+                $bet = $PlayerData['bet'];
+                $credits = $PlayerData['credits'];
+                $update_time = $PlayerData['update_time'];
+                return [$num, $bet, $credits, $update_time];
+            });
+        
+            return new Table(['座位號碼','押分', '餘分', '更新時間'], $PlayerDatas->toArray());
+        });
+
+        $grid->column('store_name', __('店家名稱'))->display(function(){
+            return $this->store->isNotEmpty()?$this->store->first()->name:'';
+        });
+        $grid->column('store_region', __('機台區域'))->display(function(){
+            return $this->store->isNotEmpty()?$this->store->first()->region:'';
+        });
+        $grid->column('category', __('機台種類'));
 
         return $grid;
     }
