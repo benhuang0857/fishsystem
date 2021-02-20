@@ -38,6 +38,11 @@ class HandOverHistoryController extends AdminController
             ]);
             $filter->equal('Store.name', __('店家名稱'));
         });
+
+        $grid->actions(function ($actions) {
+            // 去掉编辑
+            $actions->disableEdit();
+        });
         
         $grid->column('store.region', __('店家區域'));
         $grid->column('store.name', __('店家名稱'));
