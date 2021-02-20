@@ -10,6 +10,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Widgets\Table;
 
 class PlayerDataController extends AdminController
 {
@@ -25,9 +26,11 @@ class PlayerDataController extends AdminController
      *
      * @return Grid
      */
+
     protected function grid()
     {
         $grid = new Grid(new PlayerData());
+
         $grid->model()->orderBy('update_time', 'DESC');
         $grid->model()->where('num', '<=', 5);
         $grid->disableCreateButton();
@@ -69,6 +72,9 @@ class PlayerDataController extends AdminController
 
         return $grid;
     }
+    
+
+
 
     /**
      * Make a show builder.
