@@ -95,9 +95,19 @@ class PlayerDataController extends AdminController
             $filter->equal('mac', __('機台身分證'));
         });
 
+        $grid->batchActions(function ($batch) {
+            $batch->disableDelete();
+        });
+        
+        // 去掉批量操作
+        $grid->disableBatchActions();
+
+        $grid->disableActions();
+
         $grid->column('mac', __('Mac'))->expand(function () {
 
-            $PlayerData = $this->PlayerData()->where('num', '<=', 5)->get();
+            $PlayerData = $this->PlayerData()->where('num', '<=', 5)->get(); //for fish and fish2
+
             //$PlayerData = $this->PlayerData()->get(); //for fish3
             $PlayerDatas = $PlayerData->map(function ($PlayerData) {
                 $num = $PlayerData['num'] + 1;
