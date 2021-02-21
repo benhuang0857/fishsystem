@@ -81,7 +81,7 @@ class StoreController extends AdminController
             });
             return $income;
         });
-        $grid->column('store_payout', __('店家支出'))->display(function(){
+        $grid->column('store_payout', __('店家支出'))->display(function () {
             $payout = 0;
             $this->Machine->each(function ($machine) use (&$payout) {
                 $machine->fishData->each(function ($fish) use (&$payout) {
@@ -106,7 +106,7 @@ class StoreController extends AdminController
 
         $grid->column('hand_over', __('建立交班紀錄'))->display(function(){
             return '<a href="'.url('/admin/store/create-hand-over-histories-db/'.$this->id).'">建立交班紀錄</a>';
-        })->totalRow('<a href="'.url('/admin/store/create-hand-over-histories-db/all').'">建立所有交班紀錄</a>');
+        });
 
         /**
          * 自訂工具
@@ -187,7 +187,7 @@ class StoreController extends AdminController
                 $fish_data = $machine->fishData;
             } else {
                 // 篩選魚機紀錄，該紀錄更新時間大於最後一筆交班時間
-                $fish_data = $machine->fishData()->where('update_time', '>', $last_handover->updated_at)->get();
+                $fish_data = $machine->fishData()->where('update_time', '>=', $last_handover->updated_at)->get();
             }
             // 計算加總魚機收支狀況
             $fish_data->each(function ($fish) use (&$income, &$payout) {
@@ -221,7 +221,10 @@ class StoreController extends AdminController
     public function permission($grid)
     {
         if (Admin::user()->isAdministrator()) {
-            $grid;
+            // 僅管理員可見全部交班按鈕
+            $grid->tools(function (Grid\Tools $tools) {
+                $tools->append('<a class="btn btn-sm btn-danger" href="'.url('/admin/store/create-hand-over-histories-db/all').'">建立所有交班紀錄</a>');
+            });
         } else {
             $grid->model()->where('id', 1);
         }
