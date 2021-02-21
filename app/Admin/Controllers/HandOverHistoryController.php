@@ -61,8 +61,16 @@ class HandOverHistoryController extends AdminController
         
         $grid->column('store.region', __('店家區域'));
         $grid->column('store.name', __('店家名稱'));
-        $grid->column('income', __('收入'));
-        $grid->column('payout', __('支出'));
+        $grid->column('income', __('收入(幣)'));
+        $grid->column('payout', __('支出(幣)'));
+        $grid->column('total', __('總計(幣)'))->display(function(){
+            return $this->income - $this->payout;
+        });
+        $grid->column('total_change', __('金額'))->display(function(){
+            $result = $this->income - $this->payout;
+            $change = $result*4;
+            return $change;
+        });
         $grid->column('created_at', __('匯出時間'));
 
         return $grid;

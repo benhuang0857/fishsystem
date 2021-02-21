@@ -97,7 +97,8 @@ class PlayerDataController extends AdminController
 
         $grid->column('mac', __('Mac'))->expand(function () {
 
-            $PlayerData = $this->PlayerData()->where('num', '<=', 5)->get();
+            //$PlayerData = $this->PlayerData()->where('num', '<=', 5)->get();
+            $PlayerData = $this->PlayerData()->get(); //for fish3
             $PlayerDatas = $PlayerData->map(function ($PlayerData) {
                 $num = $PlayerData['num'] + 1;
                 $bet = $PlayerData['bet'];
@@ -108,6 +109,8 @@ class PlayerDataController extends AdminController
         
             return new Table(['座位號碼','押分', '餘分', '更新時間'], $PlayerDatas->toArray());
         });
+        
+        $grid->column('category', __('機台種類'));
 
         $grid->column('store_name', __('店家名稱'))->display(function(){
             return $this->store->isNotEmpty()?$this->store->first()->name:'';
@@ -115,7 +118,6 @@ class PlayerDataController extends AdminController
         $grid->column('store_region', __('機台區域'))->display(function(){
             return $this->store->isNotEmpty()?$this->store->first()->region:'';
         });
-        $grid->column('category', __('機台種類'));
 
         return $grid;
     }
