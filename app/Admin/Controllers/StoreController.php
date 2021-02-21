@@ -10,10 +10,9 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-Use Encore\Admin\Admin;
+Use Admin;
 use App\Model\HandOverHistory;
 use Encore\Admin\Widgets\Table;
-
 class StoreController extends AdminController
 {
     /**
@@ -30,7 +29,9 @@ class StoreController extends AdminController
      */
     protected function grid()
     {
+        
         $grid = new Grid(new Store());
+        $this->permission($grid);
 
         $grid->model()->orderBy('updated_at', 'DESC');
 
@@ -72,47 +73,40 @@ class StoreController extends AdminController
             return $this->machine->isNotEmpty()?count($this->machine):'';
         });
         $grid->column('store_income', __('店家收入'))->display(function(){
-            $store = Store::find($this->id);
-            return isset($this->id) ? $store->Machine->reduce(function($current, $item){
-                return $current + $item->fishData->income;
-            }, 0) : '';
+            $income = 0;
+            $this->Machine->each(function ($machine) use (&$income) {
+                $machine->fishData->each(function ($fish) use (&$income) {
+                    $income += $fish->income;
+                });
+            });
+            return $income;
         });
         $grid->column('store_payout', __('店家支出'))->display(function(){
-            $store = Store::find($this->id);
-            return isset($this->id) ? $store->Machine->reduce(function($current, $item){
-                return $current + $item->fishData->payout;
-            }, 0) : '';
+            $payout = 0;
+            $this->Machine->each(function ($machine) use (&$payout) {
+                $machine->fishData->each(function ($fish) use (&$payout) {
+                    $payout += $fish->payout;
+                });
+            });
+            return $payout;
         });
         $grid->column('store_earn', __('店家淨利'))->display(function(){
-            $store = Store::find($this->id);
-            if(isset($this->id))
-            {
-                $income = $store->Machine->reduce(function($current, $item){
-                    return $current + $item->fishData->income;
-                }, 0);
-                $payout = $store->Machine->reduce(function($current, $item){
-                    return $current + $item->fishData->payout;
-                }, 0);
-
-                return $income - $payout;
-            }
+            $payout = 0;
+            $income = 0;
+            $this->Machine->each(function ($machine) use (&$payout, &$income) {
+                $machine->fishData->each(function ($fish) use (&$payout, &$income) {
+                    $payout += $fish->payout;
+                    $income += $fish->income;
+                });
+            });
+            return $income - $payout;
         });
         $grid->column('created_at', __('建立時間'));
         $grid->column('updated_at', __('更新時間'));
 
         $grid->column('hand_over', __('建立交班紀錄'))->display(function(){
-            $store = Store::find($this->id);
-            if(isset($this->id))
-            {
-                $income = $store->Machine->reduce(function($current, $item){
-                    return $current + $item->fishData->income;
-                }, 0);
-                $payout = $store->Machine->reduce(function($current, $item){
-                    return $current + $item->fishData->payout;
-                }, 0);
-            }
-            return '<a href="'.url('/admin/store/create-hand-over-histories-db/'.$this->id.'/'.$income.'/'.$payout).'">建立交班紀錄</a>';
-        });
+            return '<a href="'.url('/admin/store/create-hand-over-histories-db/'.$this->id).'">建立交班紀錄</a>';
+        })->totalRow('<a href="'.url('/admin/store/create-hand-over-histories-db/all').'">建立所有交班紀錄</a>');
 
         /**
          * 自訂工具
@@ -164,14 +158,72 @@ class StoreController extends AdminController
         return $form;
     }
 
-    public function CreateHandOverHistoriesDB($id, $income, $payout)
+    public function CreateHandOverHistoriesDB($id)
     {
+        // 店家
+        $store = Store::find($id);
+        // 該店家最後一筆交班資料
+        $last_handover = $store->handOverRecords->sortByDesc('id')->first();
+        // 是否為第一筆資料
+        $is_first_handover = is_null($last_handover);
+        // 過早交班驗證
+        if (!$is_first_handover) {
+            // 過早交班，該店家最後交班時間低於 6 小時
+            $is_too_early = 60 * 60 * 6 > time() - $last_handover->updated_at->timestamp;
+            if ($is_too_early) {
+                return redirect(admin_url('store'));
+            }
+        }
+        // 該店家擁有之機器
+        $machines = $store->Machine;
+        // 該班總收入
+        $income = 0;
+        // 該班總支出
+        $payout = 0;
+        // 針對該店家所有機器的魚機資料
+        $fish_data = $machines->each(function ($machine) use ($is_first_handover, $last_handover, &$income, &$payout) {
+            if ($is_first_handover) {
+                // 該店的第一次交班紀錄，紀錄目前所有資料
+                $fish_data = $machine->fishData;
+            } else {
+                // 篩選魚機紀錄，該紀錄更新時間大於最後一筆交班時間
+                $fish_data = $machine->fishData()->where('update_time', '>', $last_handover->updated_at)->get();
+            }
+            // 計算加總魚機收支狀況
+            $fish_data->each(function ($fish) use (&$income, &$payout) {
+                $income += $fish->income;
+                $payout += $fish->payout;
+            });
+        });
         HandOverHistory::create([
             'store_id' => $id,
             'income' => $income,
             'payout' => $payout
         ]);
-
         return redirect(admin_url('store'));
+    }
+
+    public function CreateAllHandOverHistoriesDB()
+    {
+        // 只有管理員能夠交班全部
+        if (Admin::user()->isAdministrator()) {
+            $stores = Store::all();
+            $stores->each(function ($store) {
+                $this->CreateHandOverHistoriesDB($store->id);
+            });
+            return redirect(admin_url('store'));
+        }
+    }
+    
+    /**
+     * 權限控制
+     */
+    public function permission($grid)
+    {
+        if (Admin::user()->isAdministrator()) {
+            $grid;
+        } else {
+            $grid->model()->where('id', 1);
+        }
     }
 }

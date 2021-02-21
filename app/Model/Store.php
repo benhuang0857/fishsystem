@@ -23,4 +23,9 @@ class Store extends Model
     {
         return $this->belongsToMany(Machine::class, 'store_machine', 'store_id', 'machine_id');
     }
+
+    public function handOverRecords()
+    {
+        return $this->hasMany('App\Model\HandOverHistory');
+    }
 }

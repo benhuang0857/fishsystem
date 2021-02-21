@@ -15,7 +15,7 @@ class Machine extends Model
 
     public function fishData()
     {
-        return $this->hasOne(FishData::class, 'mac', 'mac');
+        return $this->hasMany(FishData::class, 'mac', 'mac');
     }
 
     public function JackpotHistory()

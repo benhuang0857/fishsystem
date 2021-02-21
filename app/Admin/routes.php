@@ -12,7 +12,9 @@ Route::group([
 ], function (Router $router) {
 
     $router->get('/', 'HomeController@index')->name('home');
-    $router->get('store/create-hand-over-histories-db/{id}/{income}/{payout}', 'StoreController@CreateHandOverHistoriesDB');
+    $router->get('store/create-hand-over-histories-db/all', 'StoreController@CreateAllHandOverHistoriesDB');
+    $router->get('store/create-hand-over-histories-db/{id}', 'StoreController@CreateHandOverHistoriesDB');
+    // $router->resource('store/{id?}', StoreController::class);
     $router->resource('store', StoreController::class);
     $router->resource('machine', MachineController::class);
     $router->resource('handover', HandOverHistoryController::class);
