@@ -6,6 +6,7 @@ use App\Admin\Extensions\Tools\UserGender;
 
 use App\Model\Store;
 use App\Model\Machine;
+use App\Model\FishData;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -53,37 +54,41 @@ class StoreController extends AdminController
             $Machines = $Machine->map(function ($Machine) {
                 $mac = $Machine['mac'];
                 $category = $Machine['category'];
-                $total_bet = $Machine->PlayerData->reduce(function($current, $item){
+                //fish and fish2
+                $total_bet = $Machine->PlayerData->where('num', '<=', 5)->reduce(function($current, $item){
                     return $current + $item->bet;
                 }, 0);
-                $total_credits = $Machine->PlayerData->reduce(function($current, $item){
+                //fish and fish2
+                $total_credits = $Machine->PlayerData->where('num', '<=', 5)->reduce(function($current, $item){
                     return $current + $item->credits;
                 }, 0);
-                $total_earn = $total_credits/500;
+                $total_income = FishData::where('mac', $mac)->first()->income;
+                $total_payout = FishData::where('mac', $mac)->first()->payout;
+                $total_earn = ($total_income-$total_payout)*4;
                 $created_at = $Machine['created_at'];
-                return [$mac, $category, $total_bet, $total_credits, $total_earn, $created_at];
+                return [$mac, $category, $total_bet, $total_credits, $total_income, $total_payout, $total_earn, $created_at];
             });
         
-            return new Table(['mac','機種', '總累積投幣數', '總累積分數', '總營業額','建立時間'], $Machines->toArray());
+            return new Table(['mac','機種', '總押分', '總餘分', '總收入(幣)', '總支出(幣)', '機台營收(台幣)', '建立時間', '未交班機台營收'], $Machines->toArray());
         });
 
         $grid->column('region', __('店家區域'));
         $grid->column('store_machine_num', __('店家機器數量'))->display(function(){
             return $this->machine->isNotEmpty()?count($this->machine):'';
         });
-        $grid->column('store_income', __('店家收入'))->display(function(){
+        $grid->column('store_income', __('店家收入(幣)'))->display(function(){
             $store = Store::find($this->id);
             return isset($this->id) ? $store->Machine->reduce(function($current, $item){
                 return $current + $item->fishData->income;
             }, 0) : '';
         });
-        $grid->column('store_payout', __('店家支出'))->display(function(){
+        $grid->column('store_payout', __('店家支出(幣)'))->display(function(){
             $store = Store::find($this->id);
             return isset($this->id) ? $store->Machine->reduce(function($current, $item){
                 return $current + $item->fishData->payout;
             }, 0) : '';
         });
-        $grid->column('store_earn', __('店家淨利'))->display(function(){
+        $grid->column('store_earn', __('店家淨利(台幣)'))->display(function(){
             $store = Store::find($this->id);
             if(isset($this->id))
             {
@@ -94,11 +99,12 @@ class StoreController extends AdminController
                     return $current + $item->fishData->payout;
                 }, 0);
 
-                return $income - $payout;
+                return ($income - $payout)*4;
             }
         });
+        $grid->column('h', __('未交班店家營收'));
         $grid->column('created_at', __('建立時間'));
-        $grid->column('updated_at', __('更新時間'));
+        //$grid->column('updated_at', __('更新時間'));
 
         $grid->column('hand_over', __('建立交班紀錄'))->display(function(){
             $store = Store::find($this->id);
