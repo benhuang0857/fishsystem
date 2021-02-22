@@ -106,9 +106,9 @@ class PlayerDataController extends AdminController
 
         $grid->column('mac', __('Mac'))->expand(function () {
 
-            $PlayerData = $this->PlayerData()->where('num', '<=', 5)->get(); //for fish and fish2
+            //$PlayerData = $this->PlayerData()->where('num', '<=', 5)->get(); //for fish and fish2
 
-            //$PlayerData = $this->PlayerData()->get(); //for fish3
+            $PlayerData = $this->PlayerData()->get(); //for fish3
             $PlayerDatas = $PlayerData->map(function ($PlayerData) {
                 $num = $PlayerData['num'] + 1;
                 $bet = $PlayerData['bet'];

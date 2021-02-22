@@ -54,6 +54,8 @@ class StoreController extends AdminController
             $Machines = $Machine->map(function ($Machine) {
                 $mac = $Machine['mac'];
                 $category = $Machine['category'];
+
+                /*
                 //fish and fish2
                 $total_bet = $Machine->PlayerData->where('num', '<=', 5)->reduce(function($current, $item){
                     return $current + $item->bet;
@@ -62,6 +64,17 @@ class StoreController extends AdminController
                 $total_credits = $Machine->PlayerData->where('num', '<=', 5)->reduce(function($current, $item){
                     return $current + $item->credits;
                 }, 0);
+                */
+
+                //fish3
+                $total_bet = $Machine->PlayerData->reduce(function($current, $item){
+                    return $current + $item->bet;
+                }, 0);
+                //fish3
+                $total_credits = $Machine->PlayerData->reduce(function($current, $item){
+                    return $current + $item->credits;
+                }, 0);
+
                 $total_income = FishData::where('mac', $mac)->first()->income;
                 $total_payout = FishData::where('mac', $mac)->first()->payout;
                 $total_earn = ($total_income-$total_payout)*4;
